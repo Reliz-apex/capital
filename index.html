@@ -126,11 +126,29 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 
 .bar{height:9px;border-radius:6px;background:rgba(241,238,230,.08);overflow:hidden;margin-top:7px}
 .bar i{display:block;height:100%;border-radius:6px;background:var(--brass);transition:width .5s ease}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.cal .wd{text-align:center;font-size:11px;color:var(--muted);padding:4px 0}
+.cal button{background:none;border:1px solid transparent;border-radius:12px;padding:7px 0 9px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--text);font-size:14px;font-weight:600;color:var(--porcelain);cursor:pointer}
+.cal button.out{color:rgba(241,238,230,.22)}
+.cal button.hol{color:var(--danger)}
+.cal button.sel{background:var(--brass);color:#22160A;border-color:var(--brass)}
+.cal button.today{border-color:rgba(217,164,65,.6)}
+.cal .pt{width:5px;height:5px;border-radius:50%;background:var(--mint)}
+.cal .pt.none{background:transparent}
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.calhead b{font-family:var(--display);font-weight:400;font-size:17px;letter-spacing:-.02em;text-transform:capitalize}
+.hday{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--faint)}
+.hday:last-child{border-bottom:none}
+.hday .fl2{width:8px;height:8px;border-radius:3px;background:var(--danger);flex-shrink:0}
+.hday .fl2.t{background:var(--mint)}
+.hday .tx2{flex:1;min-width:0;font-size:14px;font-weight:600}
+.hday .tx2 small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
+.hday.done .tx2{color:var(--muted);text-decoration:line-through}
 .donutrow{display:flex;align-items:center;justify-content:center;gap:4px;margin:18px 0 4px}
 .donutbox{position:relative;width:212px;max-width:56vw}
 .donutbox svg{width:100%;display:block;transform:rotate(-90deg)}
 .donutc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center}
-.donutc b{font-family:var(--display);font-weight:400;font-size:15px;letter-spacing:-.01em}
+.donutc b{font-family:var(--display);font-weight:400;font-size:13px;letter-spacing:-.02em;max-width:78%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .donutc small{font-size:11px;color:var(--muted)}
 .mnav{background:none;border:none;color:var(--muted);font-size:26px;line-height:1;padding:12px 8px;cursor:pointer;font-weight:400}
 .mnav[disabled]{opacity:.22}
@@ -175,7 +193,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 .dream-b .row2 b{font-family:var(--display);font-weight:400;font-size:14px;color:var(--porcelain)}
 .share{display:flex;align-items:center;gap:10px;margin-top:11px}
 .share input[type=range]{flex:1;accent-color:var(--brass);padding:0;background:none;border:none;height:36px;touch-action:none}
-.share b{font-family:var(--display);font-weight:400;font-size:13px;min-width:44px;text-align:right}
+.share b{font-family:var(--display);font-weight:400;font-size:12px;min-width:104px;text-align:right;white-space:nowrap}
 .x{background:none;border:none;color:var(--muted);font-size:12px;padding:0;cursor:pointer;text-decoration:underline;font-weight:500}
 .back{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;padding:8px 0;display:flex;align-items:center;gap:6px;cursor:pointer}
 
@@ -234,7 +252,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   <div class="views">
 
     <!-- КАПИТАЛ -->
-    <section class="view on" id="v-cap">
+    <section class="view" id="v-cap">
       <div class="thead">
         <h2 class="title">Капитал</h2>
         <button class="lvl" data-sheet="levels"><span class="num" id="lvNum">Уровень 1</span><span class="nm" id="lvName">Самозанятый</span></button>
@@ -326,6 +344,21 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
       <div id="expList"></div>
     </section>
 
+    <!-- ЗАДАЧИ -->
+    <section class="view on" id="v-tasks">
+      <h2 class="title">Задачи</h2>
+      <div class="calhead">
+        <button class="mnav" data-tmon="-1" aria-label="Предыдущий месяц">‹</button>
+        <b id="calTitle">—</b>
+        <button class="mnav" data-tmon="1" aria-label="Следующий месяц">›</button>
+      </div>
+      <div class="cal" id="cal"></div>
+      <div class="section-h"><span id="dayTitle">—</span></div>
+      <div id="dayList"></div>
+      <div class="row"><button class="b-brass" data-sheet="task">Добавить задачу</button></div>
+      <div style="height:10px"></div>
+    </section>
+
     <!-- ЦЕЛИ -->
     <section class="view" id="v-goals">
       <h2 class="title">Цели</h2>
@@ -338,7 +371,8 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   </div>
 
   <nav class="tabbar">
-    <button class="tab on" data-view="v-cap"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3.2"/><path d="M12 8.8V7M12 17v-1.8"/></svg>Капитал</button>
+    <button class="tab on" data-view="v-tasks"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Задачи</button>
+    <button class="tab" data-view="v-cap"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3.2"/><path d="M12 8.8V7M12 17v-1.8"/></svg>Капитал</button>
     <button class="tab" data-view="v-pig"><svg viewBox="0 0 24 24"><path d="M5 9h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>Копилка</button>
     <button class="tab" data-view="v-exp"><svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/></svg>Расходы</button>
     <button class="tab" data-view="v-goals"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg>Цели</button>
@@ -371,7 +405,20 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   var CATS=["Еда","Транспорт","Дом","Здоровье","Дети","Развлечения","Прочее"];
   var ACATS=["Недвижимость","Транспорт","Ювелирные изделия"];
   var CCOL={"Еда":"#D9A441","Транспорт":"#7FD1B9","Дом":"#8FA9E8","Здоровье":"#E8836B","Дети":"#C79BE0","Развлечения":"#5FC6A8","Прочее":"#9AA8A2"};
-  var vm=null;
+  var vm=null,tm=null,selDay=null;
+  var HOL=[
+    ["01-01","Новогодние каникулы"],["01-02","Новогодние каникулы"],["01-03","Новогодние каникулы"],
+    ["01-04","Новогодние каникулы"],["01-05","Новогодние каникулы"],["01-06","Новогодние каникулы"],
+    ["01-07","Рождество Христово"],["01-08","Новогодние каникулы"],
+    ["02-23","День защитника Отечества"],["03-08","Международный женский день"],
+    ["05-01","Праздник Весны и Труда"],["05-09","День Победы"],
+    ["06-12","День России"],["11-04","День народного единства"]
+  ];
+  function holidayOf(date){
+    var md=date.slice(5);
+    for(var i=0;i<HOL.length;i++){if(HOL[i][0]===md)return HOL[i][1];}
+    return null;
+  }
   var LEVELS=[
     {n:1,cap:10000000,name:"Самозанятый"},
     {n:2,cap:20000000,name:"Основатель"},
@@ -459,11 +506,11 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   function load(){
     try{var raw=localStorage.getItem(KEY);
       if(raw){var p=JSON.parse(raw);for(var k in p){if(p[k]!==undefined)S[k]=p[k];}}}catch(e){}
-    ["ops","expenses","dreams","assets","history"].forEach(function(k){if(!S[k])S[k]=[];});
+    ["ops","expenses","dreams","assets","history","tasks"].forEach(function(k){if(!S[k])S[k]=[];});
     normalize();
   }
   function normalize(){
-    ["ops","expenses","dreams","assets","history"].forEach(function(k){if(!S[k])S[k]=[];});
+    ["ops","expenses","dreams","assets","history","tasks"].forEach(function(k){if(!S[k])S[k]=[];});
     if(!S.pig)S.pig={target:0,month:"",start:"",steps:[],celebrated:false,doneDate:""};
     if(!S.pig.steps)S.pig.steps=[];
     if(!S.pig.month)S.pig.month=monthKey(today());
@@ -664,6 +711,29 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
           var cls=(j===i)?"cur":(j<i?"got":"");
           return '<div class="lrow '+cls+'"><span class="lb">'+x.n+'</span>'+
             '<span class="ln">'+x.name+'</span><span class="lc">до '+shortSum(x.cap)+'</span></div>';}).join(""));
+    },
+    editDream:function(id){
+      var d=S.dreams.filter(function(x){return x.id===id;})[0];if(!d)return;
+      openSheet('<h3>Изменить цель</h3>'+
+        '<div class="field"><label class="fl">Название</label><input id="i-t" value="'+esc(d.title)+'"></div>'+
+        '<div class="field"><label class="fl">Сколько нужно</label><input id="i-amt" type="text" inputmode="numeric" class="num" value="'+fmt(d.target)+'"></div>'+
+        '<div class="row"><button class="b-brass" id="i-ok">Сохранить</button></div>');
+      el("i-ok").onclick=function(){
+        var t=el("i-t").value.trim(),v=num(el("i-amt").value);
+        if(!t||!v)return;
+        d.title=t;d.target=v;save();render();closeSheet();};
+    },
+    task:function(){
+      openSheet('<h3>Новая задача</h3>'+
+        '<div class="field"><label class="fl">Что сделать</label><input id="i-t" placeholder="Позвонить в банк"></div>'+
+        '<div class="field"><label class="fl">Дата</label><input id="i-d" type="date" value="'+selDay+'"></div>'+
+        '<div class="field"><label class="fl">Время (необязательно)</label><input id="i-tm" type="time"></div>'+
+        '<div class="row"><button class="b-brass" id="i-ok">Добавить</button></div>');
+      el("i-t").focus();
+      el("i-ok").onclick=function(){
+        var t=el("i-t").value.trim();if(!t)return;
+        S.tasks.push({id:uid(),title:t,date:el("i-d").value||selDay,time:el("i-tm").value||"",done:false});
+        save();render();closeSheet();};
     },
     backup:function(){
       var json=JSON.stringify(S);
@@ -899,7 +969,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
         'stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" stroke-linecap="round"></circle>';
       off+=C*frac;return seg;}).join("");
     el("donut").innerHTML='<circle cx="70" cy="70" r="'+R+'" fill="none" stroke="rgba(241,238,230,.08)" stroke-width="15"></circle>'+(tot?segs:"");
-    el("dMonth").textContent=monthName(vm).replace(/ \d{4}$/,"");
+    el("dMonth").textContent=new Date(vm+"-01").toLocaleDateString("ru-RU",{month:"long"});
     el("dOps").textContent=me.length?(me.length+" "+plural(me.length,"операция","операции","операций")):"нет операций";
 
     el("cats").innerHTML=keys.length?keys.map(function(k){
@@ -911,6 +981,38 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
       return '<div class="op"><div class="dot out">−</div><div class="op-t"><b>'+esc(e.note)+
         '</b><small>'+e.cat+' · '+human(e.date)+'</small></div><div class="op-a minus">'+m(e.amount)+'</div></div>';}).join("");
 
+    // задачи
+    if(!tm)tm=mk;
+    if(!selDay)selDay=today();
+    var d0=new Date(tm+"-01");
+    el("calTitle").textContent=d0.toLocaleDateString("ru-RU",{month:"long",year:"numeric"}).replace(" г.","");
+    var first=(d0.getDay()+6)%7;
+    var dim=new Date(d0.getFullYear(),d0.getMonth()+1,0).getDate();
+    var cells=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"].map(function(w){return '<div class="wd">'+w+'</div>';});
+    for(var q=0;q<first;q++)cells.push('<button class="out" disabled></button>');
+    for(var dd=1;dd<=dim;dd++){
+      var ds=tm+"-"+String(dd).padStart(2,"0");
+      var hol=holidayOf(ds);
+      var has=S.tasks.some(function(t){return t.date===ds;});
+      var wd=new Date(ds).getDay();
+      cells.push('<button data-day="'+ds+'" class="'+((hol||wd===0||wd===6)?"hol ":"")+
+        (ds===selDay?"sel ":"")+(ds===today()?"today":"")+'">'+dd+
+        '<span class="pt'+(has?"":" none")+'"></span></button>');
+    }
+    el("cal").innerHTML=cells.join("");
+
+    var selHol=holidayOf(selDay);
+    var dayTasks=S.tasks.filter(function(t){return t.date===selDay;})
+      .sort(function(a,b){return (a.time||"99").localeCompare(b.time||"99");});
+    el("dayTitle").textContent=new Date(selDay).toLocaleDateString("ru-RU",{day:"numeric",month:"long",weekday:"long"});
+    el("dayList").innerHTML=
+      (selHol?'<div class="hday"><span class="fl2"></span><div class="tx2">'+selHol+'<small>государственный праздник</small></div></div>':"")+
+      (dayTasks.length?dayTasks.map(function(t){
+        return '<div class="hday '+(t.done?"done":"")+'"><span class="fl2 t"></span>'+
+          '<div class="tx2"><button class="x" data-task="'+t.id+'" style="text-decoration:none;color:inherit;font-weight:600;font-size:14px">'+esc(t.title)+'</button>'+
+          '<small>'+(t.time?t.time+" · ":"")+'<button class="x" data-tdel="'+t.id+'">удалить</button></small></div></div>';
+      }).join(""):(selHol?"":'<div class="empty">На этот день ничего не запланировано.</div>'));
+
     // цели
     var used=S.dreams.reduce(function(a,d){return a+d.share;},0);
     el("dreams").innerHTML=S.dreams.length?S.dreams.map(function(d){
@@ -920,8 +1022,8 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
         '<div class="dream-b"><h4>'+esc(d.title)+'</h4>'+
         '<div class="row2"><span>Отложено <b>'+m(g)+'</b> из '+m(d.target)+'</span><span>'+Math.round(p)+'%</span></div>'+
         '<div class="bar"><i style="width:'+p+'%"></i></div>'+
-        '<div class="share"><input type="range" min="0" max="100" value="'+d.share+'" data-share="'+d.id+'" aria-label="Доля накопленного"><b>'+d.share+'%</b></div>'+
-        '<div style="margin-top:8px"><button class="x" data-photo="'+d.id+'">Сменить фото</button> · <button class="x" data-del="'+d.id+'">Удалить</button></div>'+
+        '<div class="share"><input type="range" min="0" max="100" value="'+d.share+'" data-share="'+d.id+'" aria-label="Доля накопленного"><b>'+d.share+'% · '+m(g)+'</b></div>'+
+        '<div style="margin-top:8px"><button class="x" data-edit="'+d.id+'">Изменить</button> · <button class="x" data-photo="'+d.id+'">Фото</button> · <button class="x" data-del="'+d.id+'">Удалить</button></div>'+
         '</div></div>';}).join(""):'<div class="empty">Целей пока нет. Добавь первую и загрузи под неё фото.</div>';
     if(used>100)el("dreams").insertAdjacentHTML("afterbegin",
       '<div class="empty" style="border-color:rgba(232,131,107,.5);color:var(--danger);margin-bottom:14px">Доли целей дают '+used+'%. Уменьши любую до суммы не больше 100%.</div>');
@@ -949,6 +1051,17 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     if(im){pickImage(im.dataset.img||im.dataset.photo);return;}
     var ad=e.target.closest("[data-adel]");
     if(ad){S.assets=S.assets.filter(function(x){return x.id!==ad.dataset.adel;});save();render();return;}
+    var ed=e.target.closest("[data-edit]");
+    if(ed){sheets.editDream(ed.dataset.edit);return;}
+    var td=e.target.closest("[data-task]");
+    if(td){var t=S.tasks.filter(function(x){return x.id===td.dataset.task;})[0];
+      if(t){t.done=!t.done;save();render();}return;}
+    var tdel=e.target.closest("[data-tdel]");
+    if(tdel){S.tasks=S.tasks.filter(function(x){return x.id!==tdel.dataset.tdel;});save();render();return;}
+    var dc=e.target.closest("[data-day]");
+    if(dc){selDay=dc.dataset.day;render();return;}
+    var mn=e.target.closest("[data-tmon]");
+    if(mn){tm=shiftMonth(tm,+mn.dataset.tmon);render();return;}
     var d=e.target.closest("[data-del]");
     if(d){S.dreams=S.dreams.filter(function(x){return x.id!==d.dataset.del;});save();render();}
   });
@@ -968,8 +1081,8 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     d.share=+r.value;
     var card=r.closest(".dream");
     var lbl=r.parentNode.querySelector("b");
-    if(lbl)lbl.textContent=d.share+"%";
     var g=S.balance*d.share/100, p=d.target?Math.min(100,g/d.target*100):0;
+    if(lbl)lbl.textContent=d.share+"% · "+m(g);
     var bar=card&&card.querySelector(".bar i");
     if(bar)bar.style.width=p+"%";
     var row=card&&card.querySelector(".row2");

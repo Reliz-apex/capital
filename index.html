@@ -344,6 +344,14 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     <button class="tab" data-view="v-goals"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg>Цели</button>
   </nav>
 
+  <div class="crop" id="gate">
+    <h4>Reliz Capital</h4>
+    <div class="hint">Введи код доступа — данные подтянутся с сервера</div>
+    <input id="gcode" type="password" inputmode="text" placeholder="Код доступа" autocomplete="off">
+    <div class="hint" id="gerr" style="color:var(--danger);display:none">Код не подошёл</div>
+    <div class="row"><button class="b-brass" id="gok">Войти</button></div>
+    <button class="x" id="gskip" style="align-self:center">Работать без синхронизации</button>
+  </div>
   <div class="crop" id="crop">
     <h4>Кадр обложки</h4>
     <div class="hint">Двигай пальцем, масштабируй ползунком или щипком</div>
@@ -414,9 +422,47 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     return STEPS.map(function(a,i){return{id:"s"+i+uid(),amount:a,done:false,date:null};});
   }
 
+  var API="https://n8n.relizai.ru/webhook/capital";
+  var CODE=null,syncTimer=null,syncState="off";
+  try{CODE=localStorage.getItem("kopilka.code")||null;}catch(e){}
+
+  function setSync(st){syncState=st;}
+  function api(action,extra){
+    var body=Object.assign({action:action,code:CODE},extra||{});
+    return fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+      .then(function(r){if(!r.ok)throw new Error("http");return r.json();});
+  }
+  function pull(){
+    return api("load").then(function(res){
+      if(!res||res.ok===false)throw new Error("code");
+      var rd=res.data||null,rs=+res.stamp||0;
+      if(rd&&typeof rd==="object"&&rs>(S.stamp||0)){
+        for(var k in rd){if(rd[k]!==undefined)S[k]=rd[k];}
+        S.stamp=rs;saveLocal();normalize();render();
+      }else if(S.stamp){pushNow();}
+      setSync("ok");return true;
+    });
+  }
+  function pushNow(){
+    if(!CODE)return;
+    setSync("wait");
+    return api("save",{data:S,stamp:S.stamp||Date.now()})
+      .then(function(){setSync("ok");})
+      .catch(function(){setSync("err");});
+  }
+  function schedulePush(){
+    if(!CODE)return;
+    clearTimeout(syncTimer);
+    syncTimer=setTimeout(pushNow,1500);
+  }
+
   function load(){
     try{var raw=localStorage.getItem(KEY);
       if(raw){var p=JSON.parse(raw);for(var k in p){if(p[k]!==undefined)S[k]=p[k];}}}catch(e){}
+    ["ops","expenses","dreams","assets","history"].forEach(function(k){if(!S[k])S[k]=[];});
+    normalize();
+  }
+  function normalize(){
     ["ops","expenses","dreams","assets","history"].forEach(function(k){if(!S[k])S[k]=[];});
     if(!S.pig)S.pig={target:0,month:"",start:"",steps:[],celebrated:false,doneDate:""};
     if(!S.pig.steps)S.pig.steps=[];
@@ -428,7 +474,8 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
       S.pig.steps.forEach(function(st,i){if(was[i]&&was[i].done){st.done=true;st.date=was[i].date;}});
     }
   }
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+  function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+  function save(){S.stamp=Date.now();saveLocal();schedulePush();}
 
   function collected(){return S.pig.steps.filter(function(s){return s.done;}).reduce(function(a,s){return a+s.amount;},0);}
   function assetsTotal(){return S.assets.reduce(function(a,x){return a+x.value;},0);}
@@ -621,6 +668,10 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     backup:function(){
       var json=JSON.stringify(S);
       openSheet('<h3>Резервная копия</h3>'+
+        '<div class="sub" style="margin-bottom:12px">Синхронизация: <b id="i-sst">'+
+          (syncState==="ok"?"включена, данные на сервере":(syncState==="err"?"ошибка связи с сервером":(syncState==="wait"?"отправляю…":"выключена")))+'</b></div>'+
+        '<div class="row" style="margin-bottom:18px"><button class="b-ghost b-small" id="i-sync">Синхронизировать сейчас</button>'+
+        '<button class="b-ghost b-small" id="i-logout">Сменить код</button></div>'+
         '<div class="sub" style="margin-bottom:10px">Скопируй этот текст и сохрани в заметках. Из него данные восстанавливаются на любом устройстве.</div>'+
         '<div class="field"><textarea id="i-out" readonly>'+json.replace(/</g,"&lt;")+'</textarea></div>'+
         '<div class="row"><button class="b-brass" id="i-copy">Скопировать</button>'+
@@ -628,6 +679,17 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
         '<div class="section-h"><span>Восстановить</span></div>'+
         '<div class="field"><textarea id="i-in" placeholder="Вставь сюда сохранённый текст"></textarea></div>'+
         '<div class="row"><button class="b-ghost" id="i-rest">Восстановить данные</button></div>');
+      el("i-sync").onclick=function(){
+        if(!CODE){closeSheet();openGate(false);return;}
+        el("i-sync").textContent="Синхронизирую…";
+        pull().then(function(){return pushNow();}).then(function(){el("i-sync").textContent="Готово";})
+          .catch(function(){el("i-sync").textContent="Не вышло";});
+      };
+      el("i-logout").onclick=function(){
+        CODE=null;setSync("off");
+        try{localStorage.removeItem("kopilka.code");}catch(e){}
+        closeSheet();openGate(false);
+      };
       el("i-copy").onclick=function(){
         var t=el("i-out");t.select();
         var ok=false;
@@ -918,9 +980,31 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     if(e.target.closest("[data-share]"))render();
   });
 
+  var gate=el("gate");
+  function openGate(err){
+    gate.classList.add("on");
+    el("gerr").style.display=err?"block":"none";
+    setTimeout(function(){el("gcode").focus();},150);
+  }
+  function closeGate(){gate.classList.remove("on");}
+  el("gok").addEventListener("click",function(){
+    var v=el("gcode").value.trim();if(!v)return;
+    CODE=v;el("gok").textContent="Проверяю…";
+    pull().then(function(){
+      try{localStorage.setItem("kopilka.code",CODE);}catch(e){}
+      el("gok").textContent="Войти";el("gcode").value="";closeGate();
+    }).catch(function(){
+      CODE=null;el("gok").textContent="Войти";el("gerr").style.display="block";
+    });
+  });
+  el("gcode").addEventListener("keydown",function(e){if(e.key==="Enter")el("gok").click();});
+  el("gskip").addEventListener("click",function(){CODE=null;setSync("off");closeGate();});
+
   function tick(){el("clock").textContent=new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});}
   tick();setInterval(tick,30000);
   load();render();
+  if(CODE){pull().catch(function(){openGate(true);});}else{openGate(false);}
+  window.addEventListener("focus",function(){if(CODE)pull().catch(function(){});});
 })();
 </script>
 </body>

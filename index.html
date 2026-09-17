@@ -139,6 +139,16 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 .calhead b{font-family:var(--display);font-weight:400;font-size:17px;letter-spacing:-.02em;text-transform:capitalize}
 .hday{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--faint)}
 .hday:last-child{border-bottom:none}
+.swipe{position:relative;overflow:hidden;border-bottom:1px solid var(--faint);border-radius:12px}
+.swipe-del{position:absolute;right:0;top:0;bottom:0;width:98px;display:flex}
+.swipe-del button{flex:1;background:var(--danger);color:#2A0F08;border:none;border-radius:0;font-size:13px;font-weight:700;padding:0}
+.swipe-body{position:relative;background:var(--jar);display:flex;align-items:center;gap:11px;padding:13px 4px;
+  transition:transform .22s cubic-bezier(.3,.9,.3,1);touch-action:pan-y;cursor:pointer}
+.swipe-body .tx3{flex:1;min-width:0;font-size:14px;font-weight:600}
+.swipe-body .tx3 small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
+.swipe.done .tx3{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(127,209,185,.7)}
+.swipe .mk{width:19px;height:19px;border-radius:6px;border:1.7px solid var(--muted);flex-shrink:0;display:grid;place-items:center;font-size:11px;color:transparent}
+.swipe.done .mk{background:var(--mint);border-color:var(--mint);color:#08211D}
 .hday .fl2{width:8px;height:8px;border-radius:3px;background:var(--danger);flex-shrink:0}
 .hday .fl2.t{background:var(--mint)}
 .hday .tx2{flex:1;min-width:0;font-size:14px;font-weight:600}
@@ -193,7 +203,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 .dream-b .row2 b{font-family:var(--display);font-weight:400;font-size:14px;color:var(--porcelain)}
 .share{display:flex;align-items:center;gap:10px;margin-top:11px}
 .share input[type=range]{flex:1;accent-color:var(--brass);padding:0;background:none;border:none;height:36px;touch-action:none}
-.share b{font-family:var(--display);font-weight:400;font-size:12px;min-width:104px;text-align:right;white-space:nowrap}
+.share b{font-family:var(--display);font-weight:400;font-size:13px;min-width:46px;text-align:right;white-space:nowrap}
 .x{background:none;border:none;color:var(--muted);font-size:12px;padding:0;cursor:pointer;text-decoration:underline;font-weight:500}
 .back{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;padding:8px 0;display:flex;align-items:center;gap:6px;cursor:pointer}
 
@@ -1008,23 +1018,37 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     el("dayList").innerHTML=
       (selHol?'<div class="hday"><span class="fl2"></span><div class="tx2">'+selHol+'<small>государственный праздник</small></div></div>':"")+
       (dayTasks.length?dayTasks.map(function(t){
-        return '<div class="hday '+(t.done?"done":"")+'"><span class="fl2 t"></span>'+
-          '<div class="tx2"><button class="x" data-task="'+t.id+'" style="text-decoration:none;color:inherit;font-weight:600;font-size:14px">'+esc(t.title)+'</button>'+
-          '<small>'+(t.time?t.time+" · ":"")+'<button class="x" data-tdel="'+t.id+'">удалить</button></small></div></div>';
+        return '<div class="swipe '+(t.done?"done":"")+'">'+
+          '<div class="swipe-del"><button data-tdel="'+t.id+'">Удалить</button></div>'+
+          '<div class="swipe-body" data-task="'+t.id+'"><span class="mk">✓</span>'+
+          '<div class="tx3">'+esc(t.title)+(t.time?'<small>'+t.time+'</small>':'')+'</div></div></div>';
       }).join(""):(selHol?"":'<div class="empty">На этот день ничего не запланировано.</div>'));
 
     // цели
     var used=S.dreams.reduce(function(a,d){return a+d.share;},0);
+    var reached=null;
     el("dreams").innerHTML=S.dreams.length?S.dreams.map(function(d){
       var g=S.balance*d.share/100, p=d.target?Math.min(100,g/d.target*100):0;
+      if(p>=100&&!d.cel){d.cel=true;reached=d;}
+      if(p<100&&d.cel)d.cel=false;
       return '<div class="dream"><div class="dream-img" data-img="'+d.id+'" '+
         (d.img?'style="background-image:url('+d.img+')"':"")+'>'+(d.img?"":"<span>Добавить фото</span>")+'</div>'+
         '<div class="dream-b"><h4>'+esc(d.title)+'</h4>'+
         '<div class="row2"><span>Отложено <b>'+m(g)+'</b> из '+m(d.target)+'</span><span>'+Math.round(p)+'%</span></div>'+
         '<div class="bar"><i style="width:'+p+'%"></i></div>'+
-        '<div class="share"><input type="range" min="0" max="100" value="'+d.share+'" data-share="'+d.id+'" aria-label="Доля накопленного"><b>'+d.share+'% · '+m(g)+'</b></div>'+
+        '<div class="share"><input type="range" min="0" max="100" value="'+d.share+'" data-share="'+d.id+'" aria-label="Доля накопленного"><b>'+d.share+'%</b></div>'+
         '<div style="margin-top:8px"><button class="x" data-edit="'+d.id+'">Изменить</button> · <button class="x" data-photo="'+d.id+'">Фото</button> · <button class="x" data-del="'+d.id+'">Удалить</button></div>'+
         '</div></div>';}).join(""):'<div class="empty">Целей пока нет. Добавь первую и загрузи под неё фото.</div>';
+    if(reached){
+      saveLocal();
+      setTimeout(function(){
+        boom();
+        openSheet('<div class="party"><div class="em">🎉</div><h3>Цель достигнута</h3>'+
+          '<div class="sub" style="margin-bottom:14px">'+esc(reached.title)+' — '+m(reached.target)+' собрано полностью</div></div>'+
+          '<div class="row"><button class="b-brass" id="okc">Отлично</button></div>');
+        el("okc").onclick=closeSheet;
+      },250);
+    }
     if(used>100)el("dreams").insertAdjacentHTML("afterbegin",
       '<div class="empty" style="border-color:rgba(232,131,107,.5);color:var(--danger);margin-bottom:14px">Доли целей дают '+used+'%. Уменьши любую до суммы не больше 100%.</div>');
   }
@@ -1054,7 +1078,9 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     var ed=e.target.closest("[data-edit]");
     if(ed){sheets.editDream(ed.dataset.edit);return;}
     var td=e.target.closest("[data-task]");
-    if(td){var t=S.tasks.filter(function(x){return x.id===td.dataset.task;})[0];
+    if(td){
+      if(td.dataset.open==="1"){td.style.transform="";td.dataset.open="0";return;}
+      var t=S.tasks.filter(function(x){return x.id===td.dataset.task;})[0];
       if(t){t.done=!t.done;save();render();}return;}
     var tdel=e.target.closest("[data-tdel]");
     if(tdel){S.tasks=S.tasks.filter(function(x){return x.id!==tdel.dataset.tdel;});save();render();return;}
@@ -1082,7 +1108,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     var card=r.closest(".dream");
     var lbl=r.parentNode.querySelector("b");
     var g=S.balance*d.share/100, p=d.target?Math.min(100,g/d.target*100):0;
-    if(lbl)lbl.textContent=d.share+"% · "+m(g);
+    if(lbl)lbl.textContent=d.share+"%";
     var bar=card&&card.querySelector(".bar i");
     if(bar)bar.style.width=p+"%";
     var row=card&&card.querySelector(".row2");
@@ -1112,6 +1138,35 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   });
   el("gcode").addEventListener("keydown",function(e){if(e.key==="Enter")el("gok").click();});
   el("gskip").addEventListener("click",function(){CODE=null;setSync("off");closeGate();});
+
+  var sw=null;
+  document.addEventListener("touchstart",function(e){
+    var b=e.target.closest(".swipe-body");
+    if(!b)return;
+    var t=e.touches[0];
+    sw={el:b,x:t.clientX,y:t.clientY,dx:0,open:b.dataset.open==="1",moved:false};
+  },{passive:true});
+  document.addEventListener("touchmove",function(e){
+    if(!sw)return;
+    var t=e.touches[0],dx=t.clientX-sw.x,dy=t.clientY-sw.y;
+    if(Math.abs(dy)>Math.abs(dx))return;
+    sw.moved=true;
+    var base=sw.open?-98:0;
+    var v=Math.max(-98,Math.min(0,base+dx));
+    sw.dx=v;
+    sw.el.style.transition="none";
+    sw.el.style.transform="translateX("+v+"px)";
+  },{passive:true});
+  document.addEventListener("touchend",function(){
+    if(!sw)return;
+    var el0=sw.el;
+    el0.style.transition="";
+    if(!sw.moved){sw=null;return;}
+    var open=sw.dx<-42;
+    el0.style.transform="translateX("+(open?-98:0)+"px)";
+    el0.dataset.open=open?"1":"0";
+    sw=null;
+  },{passive:true});
 
   function tick(){el("clock").textContent=new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});}
   tick();setInterval(tick,30000);

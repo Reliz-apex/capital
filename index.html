@@ -465,6 +465,12 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     return Math.round(v/1000000)+" млн";
   }
   function m(n){return nf.format(Math.round(n))+" ₽";}
+  var _sig={};
+  function setHTML(id,html){
+    if(_sig[id]===html)return;
+    _sig[id]=html;
+    var n=el(id);if(n)n.innerHTML=html;
+  }
   function esc(s){return String(s).replace(/[<>&]/g,function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;"}[c];});}
   function human(d){
     var dt=new Date(d),t=new Date(),y=new Date(Date.now()-864e5);
@@ -500,8 +506,12 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
       setSync("ok");return true;
     });
   }
+  var lastPush="";
   function pushNow(){
     if(!CODE)return;
+    var body=JSON.stringify(S);
+    if(body===lastPush){setSync("ok");return;}
+    lastPush=body;
     setSync("wait");
     return api("save",{data:S,stamp:S.stamp||Date.now()})
       .then(function(){setSync("ok");})
@@ -841,14 +851,14 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   czoom.addEventListener("input",function(){CR.z=+czoom.value/100;crLayout();});
   el("ccancel").addEventListener("click",cropClose);
   el("cok").addEventListener("click",function(){
-    var OW=720,OH=540;
+    var OW=600,OH=450;
     var kk=CR.k*CR.z;
     var dw=CR.img.naturalWidth*kk, dh=CR.img.naturalHeight*kk;
     var sx=(dw/2-CR.tx-CR.W/2)/kk, sy=(dh/2-CR.ty-CR.H/2)/kk;
     var sw=CR.W/kk, sh=CR.H/kk;
     var c=document.createElement("canvas");c.width=OW;c.height=OH;
     c.getContext("2d").drawImage(CR.img,sx,sy,sw,sh,0,0,OW,OH);
-    var out=c.toDataURL("image/jpeg",.78);
+    var out=c.toDataURL("image/jpeg",.62);
     cropClose();
     if(CR.cb)CR.cb(out);
   });
@@ -909,19 +919,19 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     el("fill").style.height=(S.pig.target?Math.min(100,got/S.pig.target*100):0)+"%";
 
     el("opCount").textContent=S.ops.length?S.ops.length+" всего":"";
-    el("ops").innerHTML=S.ops.length?S.ops.slice(0,12).map(function(o){
+    setHTML("ops",S.ops.length?S.ops.slice(0,12).map(function(o){
       var cls=o.type==="in"?"":(o.type==="goal"?"goal":"out");
       var ic=o.type==="in"?"↓":(o.type==="goal"?"★":"↑");
       return '<div class="op"><div class="dot '+cls+'">'+ic+'</div><div class="op-t"><b>'+esc(o.note)+
         '</b><small>'+human(o.date)+'</small></div><div class="op-a '+(o.type==="out"?"minus":"plus")+'">'+
         (o.type==="out"?"−":"+")+m(o.amount)+'</div></div>';
-    }).join(""):'<div class="empty">Пока пусто.</div>';
+    }).join(""):'<div class="empty">Пока пусто.</div>');
 
     // assets
     el("aTotal").textContent=m(at);
     var cap=S.balance+at;
     el("aShare").textContent="Доля в капитале — "+(cap?Math.round(at/cap*100):0)+"%";
-    el("assetGroups").innerHTML=ACATS.map(function(c){
+    setHTML("assetGroups",ACATS.map(function(c){
       var list=S.assets.filter(function(a){return a.cat===c;});
       var sum=list.reduce(function(a,x){return a+x.value;},0);
       return '<div class="section-h"><span>'+c+'</span><em>'+(list.length?m(sum):"—")+'</em></div>'+
@@ -929,7 +939,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
           return '<div class="op"><div class="dot goal">◆</div><div class="op-t"><b>'+esc(a.title)+
             '</b><small><button class="x" data-adel="'+a.id+'">удалить</button></small></div>'+
             '<div class="op-a">'+m(a.value)+'</div></div>';}).join(""):'<div class="empty">Пусто</div>');
-    }).join("");
+    }).join(""));
 
     // копилка
     var mk=monthKey(today());
@@ -946,17 +956,17 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     el("pigGot").textContent=m(got);
     el("pigDone").textContent=S.pig.steps.filter(function(s){return s.done;}).length+" / "+S.pig.steps.length;
 
-    el("steps").innerHTML=S.pig.steps.length?S.pig.steps.map(function(s,i){
+    setHTML("steps",S.pig.steps.length?S.pig.steps.map(function(s,i){
       return '<button class="stepb '+(s.done?"done":"")+'" data-step="'+s.id+'">'+
         '<span class="n">'+(i+1)+'</span><span class="a">'+m(s.amount)+'</span>'+
         '<span class="mark">'+(s.done?"✓":"○")+'</span></button>';
-    }).join(""):'<div class="empty">Шагов пока нет. Задай цель месяца.</div>';
+    }).join(""):'<div class="empty">Шагов пока нет. Задай цель месяца.</div>');
 
-    el("pigHistory").innerHTML=S.history.length?
+    setHTML("pigHistory",S.history.length?
       '<div class="section-h"><span>Закрытые месяцы</span></div>'+S.history.slice(0,6).map(function(h){
         var d=monthName(h.month);
         return '<div class="op"><div class="dot goal">★</div><div class="op-t"><b>'+d+'</b><small>цель '+m(h.target)+(h.days?(' · закрыта на '+h.days+'-й день'):'')+'</small></div>'+
-          '<div class="op-a plus">'+m(h.got)+'</div></div>';}).join(""):"";
+          '<div class="op-a plus">'+m(h.got)+'</div></div>';}).join(""):"");
 
     // расходы
     if(!vm)vm=mk;
@@ -982,14 +992,14 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     el("dMonth").textContent=new Date(vm+"-01").toLocaleDateString("ru-RU",{month:"long"});
     el("dOps").textContent=me.length?(me.length+" "+plural(me.length,"операция","операции","операций")):"нет операций";
 
-    el("cats").innerHTML=keys.length?keys.map(function(k){
+    setHTML("cats",keys.length?keys.map(function(k){
       return '<div class="crow"><span class="cdot" style="background:'+(CCOL[k]||"#9AA8A2")+'"></span>'+
         '<div class="t"><b>'+k+'</b><small>'+cnt[k]+' '+plural(cnt[k],"операция","операции","операций")+' · '+Math.round(by[k]/tot*100)+'%</small></div>'+
-        '<div class="v">'+m(by[k])+'</div></div>';}).join(""):'<div class="empty">За этот месяц трат нет.</div>';
+        '<div class="v">'+m(by[k])+'</div></div>';}).join(""):'<div class="empty">За этот месяц трат нет.</div>');
 
-    el("expList").innerHTML=me.map(function(e){
+    setHTML("expList",me.map(function(e){
       return '<div class="op"><div class="dot out">−</div><div class="op-t"><b>'+esc(e.note)+
-        '</b><small>'+e.cat+' · '+human(e.date)+'</small></div><div class="op-a minus">'+m(e.amount)+'</div></div>';}).join("");
+        '</b><small>'+e.cat+' · '+human(e.date)+'</small></div><div class="op-a minus">'+m(e.amount)+'</div></div>';}).join(""));
 
     // задачи
     if(!tm)tm=mk;
@@ -1009,25 +1019,26 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
         (ds===selDay?"sel ":"")+(ds===today()?"today":"")+'">'+dd+
         '<span class="pt'+(has?"":" none")+'"></span></button>');
     }
-    el("cal").innerHTML=cells.join("");
+    setHTML("cal",cells.join(""));
 
     var selHol=holidayOf(selDay);
     var dayTasks=S.tasks.filter(function(t){return t.date===selDay;})
       .sort(function(a,b){return (a.time||"99").localeCompare(b.time||"99");});
     el("dayTitle").textContent=new Date(selDay).toLocaleDateString("ru-RU",{day:"numeric",month:"long",weekday:"long"});
-    el("dayList").innerHTML=
+    setHTML("dayList",
       (selHol?'<div class="hday"><span class="fl2"></span><div class="tx2">'+selHol+'<small>государственный праздник</small></div></div>':"")+
       (dayTasks.length?dayTasks.map(function(t){
         return '<div class="swipe '+(t.done?"done":"")+'">'+
           '<div class="swipe-del"><button data-tdel="'+t.id+'">Удалить</button></div>'+
-          '<div class="swipe-body" data-task="'+t.id+'"><span class="mk">✓</span>'+
-          '<div class="tx3">'+esc(t.title)+(t.time?'<small>'+t.time+'</small>':'')+'</div></div></div>';
-      }).join(""):(selHol?"":'<div class="empty">На этот день ничего не запланировано.</div>'));
+          '<div class="swipe-body" data-task="'+t.id+'">'+
+          '<div class="tx3">'+esc(t.title)+(t.time?'<small>'+t.time+'</small>':'')+'</div>'+
+          '<span class="mk">✓</span></div></div>';
+      }).join(""):(selHol?"":'<div class="empty">На этот день ничего не запланировано.</div>')));
 
     // цели
     var used=S.dreams.reduce(function(a,d){return a+d.share;},0);
     var reached=null;
-    el("dreams").innerHTML=S.dreams.length?S.dreams.map(function(d){
+    setHTML("dreams",(used>100?'<div class="empty" style="border-color:rgba(232,131,107,.5);color:var(--danger);margin-bottom:14px">Доли целей дают '+used+'%. Уменьши любую до суммы не больше 100%.</div>':'')+(S.dreams.length?S.dreams.map(function(d){
       var g=S.balance*d.share/100, p=d.target?Math.min(100,g/d.target*100):0;
       if(p>=100&&!d.cel){d.cel=true;reached=d;}
       if(p<100&&d.cel)d.cel=false;
@@ -1035,10 +1046,11 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
         (d.img?'style="background-image:url('+d.img+')"':"")+'>'+(d.img?"":"<span>Добавить фото</span>")+'</div>'+
         '<div class="dream-b"><h4>'+esc(d.title)+'</h4>'+
         '<div class="row2"><span>Отложено <b>'+m(g)+'</b> из '+m(d.target)+'</span><span>'+Math.round(p)+'%</span></div>'+
+        (S.balance?'':'<div class="sub" style="margin-bottom:9px;color:var(--brass-soft)">Накоплений пока нет — положи сумму на экране «Капитал», и доля оживёт</div>')+
         '<div class="bar"><i style="width:'+p+'%"></i></div>'+
         '<div class="share"><input type="range" min="0" max="100" value="'+d.share+'" data-share="'+d.id+'" aria-label="Доля накопленного"><b>'+d.share+'%</b></div>'+
         '<div style="margin-top:8px"><button class="x" data-edit="'+d.id+'">Изменить</button> · <button class="x" data-photo="'+d.id+'">Фото</button> · <button class="x" data-del="'+d.id+'">Удалить</button></div>'+
-        '</div></div>';}).join(""):'<div class="empty">Целей пока нет. Добавь первую и загрузи под неё фото.</div>';
+        '</div></div>';}).join(""):'<div class="empty">Целей пока нет. Добавь первую и загрузи под неё фото.</div>'));
     if(reached){
       saveLocal();
       setTimeout(function(){
@@ -1049,8 +1061,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
         el("okc").onclick=closeSheet;
       },250);
     }
-    if(used>100)el("dreams").insertAdjacentHTML("afterbegin",
-      '<div class="empty" style="border-color:rgba(232,131,107,.5);color:var(--danger);margin-bottom:14px">Доли целей дают '+used+'%. Уменьши любую до суммы не больше 100%.</div>');
+
   }
 
   /* ---- events ---- */

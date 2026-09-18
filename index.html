@@ -34,7 +34,7 @@ body{background:radial-gradient(900px 600px at 50% -5%, #174A3F 0%, transparent 
   position:relative;overflow:hidden;display:flex;flex-direction:column;}
 .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:112px;height:28px;background:#020a08;border-radius:16px;z-index:40}
 .statusbar{padding:16px 26px 0;display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--muted);z-index:30}
-.views{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 20px 108px;scrollbar-width:none}
+.views{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px 20px 108px;scrollbar-width:none;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .views::-webkit-scrollbar{display:none}
 .view{display:none;animation:in .22s ease-out}
 .view.on{display:block}
@@ -139,10 +139,10 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 .calhead b{font-family:var(--display);font-weight:400;font-size:17px;letter-spacing:-.02em;text-transform:capitalize}
 .hday{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--faint)}
 .hday:last-child{border-bottom:none}
-.swipe{position:relative;overflow:hidden;border-bottom:1px solid var(--faint);border-radius:12px}
+.swipe{position:relative;overflow:hidden;border-radius:14px;margin-bottom:8px;background:rgba(241,238,230,.04)}
 .swipe-del{position:absolute;right:0;top:0;bottom:0;width:98px;display:flex}
 .swipe-del button{flex:1;background:var(--danger);color:#2A0F08;border:none;border-radius:0;font-size:13px;font-weight:700;padding:0}
-.swipe-body{position:relative;background:var(--jar);display:flex;align-items:center;gap:11px;padding:13px 4px;
+.swipe-body{position:relative;background:var(--jar);display:flex;align-items:center;gap:16px;padding:15px 16px;
   transition:transform .22s cubic-bezier(.3,.9,.3,1);touch-action:pan-y;cursor:pointer}
 .swipe-body .tx3{flex:1;min-width:0;font-size:14px;font-weight:600}
 .swipe-body .tx3 small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
@@ -222,6 +222,14 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 .sheet h3{font-family:var(--display);font-weight:400;font-size:18px;margin:2px 0 16px;letter-spacing:-.02em}
 .grab{width:38px;height:4px;border-radius:3px;background:var(--faint);margin:0 auto 14px}
 #fw{position:absolute;inset:0;z-index:70;pointer-events:none;display:none}
+#splash{position:fixed;inset:0;z-index:200;background:linear-gradient(180deg,#12463C 0%,#08211D 100%);
+  display:flex;align-items:center;justify-content:center;transition:opacity .55s ease}
+#splash.gone{opacity:0;pointer-events:none}
+.sp-in{text-align:center;padding:0 32px;animation:spIn .7s cubic-bezier(.2,.8,.3,1)}
+.sp-title{font-family:var(--display);font-weight:500;font-size:30px;letter-spacing:-.03em;color:var(--porcelain);margin-bottom:12px}
+.sp-sub{font-size:14px;color:var(--brass-soft);line-height:1.5}
+@keyframes spIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.sp-in{animation:none}}
 .crop{position:absolute;inset:0;z-index:80;background:rgba(3,14,11,.97);display:none;flex-direction:column;justify-content:center;padding:22px;gap:16px}
 .crop.on{display:flex}
 .crop h4{margin:0;font-family:var(--display);font-weight:400;font-size:16px;text-align:center}
@@ -234,7 +242,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   linear-gradient(to bottom,transparent 50%,rgba(255,255,255,.18) 50%,rgba(255,255,255,.18) calc(50% + 1px),transparent calc(50% + 1px))}
 .czoom{width:100%;accent-color:var(--brass);height:36px;background:none;border:none;padding:0}
 @media (max-width:540px){
-  body{padding:0;gap:0;background:var(--jar)}
+  body{padding:0;gap:0;background:var(--jar);height:100dvh;overflow:hidden;overscroll-behavior:none;position:fixed;inset:0}
   .intro{display:none}
   .phone{width:100%;height:100vh;height:100dvh;max-height:none;border-radius:0;border:none;box-shadow:none}
   .notch{display:none}
@@ -388,6 +396,12 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     <button class="tab" data-view="v-goals"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg>Цели</button>
   </nav>
 
+  <div id="splash">
+    <div class="sp-in">
+      <div class="sp-title">Reliz Capital</div>
+      <div class="sp-sub">Добро пожаловать, Александр Валерьевич</div>
+    </div>
+  </div>
   <div class="crop" id="gate">
     <h4>Reliz Capital</h4>
     <div class="hint">Введи код доступа — данные подтянутся с сервера</div>
@@ -412,9 +426,9 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 (function(){
   "use strict";
   var KEY="kopilka.v3";
-  var CATS=["Еда","Транспорт","Дом","Здоровье","Дети","Развлечения","Прочее"];
+  var CATS=["Еда","Транспорт","Дом","Здоровье","Ариана","Развлечения","Прочее"];
   var ACATS=["Недвижимость","Транспорт","Ювелирные изделия"];
-  var CCOL={"Еда":"#D9A441","Транспорт":"#7FD1B9","Дом":"#8FA9E8","Здоровье":"#E8836B","Дети":"#C79BE0","Развлечения":"#5FC6A8","Прочее":"#9AA8A2"};
+  var CCOL={"Еда":"#D9A441","Транспорт":"#7FD1B9","Дом":"#8FA9E8","Здоровье":"#E8836B","Ариана":"#C79BE0","Развлечения":"#5FC6A8","Прочее":"#9AA8A2"};
   var vm=null,tm=null,selDay=null;
   var HOL=[
     ["01-01","Новогодние каникулы"],["01-02","Новогодние каникулы"],["01-03","Новогодние каникулы"],
@@ -530,6 +544,7 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     normalize();
   }
   function normalize(){
+    if(S.expenses)S.expenses.forEach(function(e){if(e.cat==="Дети")e.cat="Ариана";});
     ["ops","expenses","dreams","assets","history","tasks"].forEach(function(k){if(!S[k])S[k]=[];});
     if(!S.pig)S.pig={target:0,month:"",start:"",steps:[],celebrated:false,doneDate:""};
     if(!S.pig.steps)S.pig.steps=[];
@@ -1115,7 +1130,11 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     if(!r)return;
     var d=S.dreams.filter(function(x){return x.id===r.dataset.share;})[0];
     if(!d)return;
-    d.share=+r.value;
+    var others=S.dreams.reduce(function(a,x){return a+(x.id===d.id?0:x.share);},0);
+    var cap=Math.max(0,100-others);
+    var v=Math.min(+r.value,cap);
+    if(v!==+r.value)r.value=v;
+    d.share=v;
     var card=r.closest(".dream");
     var lbl=r.parentNode.querySelector("b");
     var g=S.balance*d.share/100, p=d.target?Math.min(100,g/d.target*100):0;
@@ -1150,6 +1169,24 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   el("gcode").addEventListener("keydown",function(e){if(e.key==="Enter")el("gok").click();});
   el("gskip").addEventListener("click",function(){CODE=null;setSync("off");closeGate();});
 
+  var dsw=null;
+  document.addEventListener("touchstart",function(e){
+    if(!el("v-tasks").classList.contains("on"))return;
+    if(e.target.closest(".swipe-body"))return;
+    var t=e.touches[0];dsw={x:t.clientX,y:t.clientY};
+  },{passive:true});
+  document.addEventListener("touchend",function(e){
+    if(!dsw)return;
+    var t=e.changedTouches[0],dx=t.clientX-dsw.x,dy=t.clientY-dsw.y;
+    dsw=null;
+    if(Math.abs(dx)<60||Math.abs(dy)>45)return;
+    var d=new Date(selDay);
+    d.setDate(d.getDate()+(dx<0?1:-1));
+    selDay=d.toISOString().slice(0,10);
+    tm=selDay.slice(0,7);
+    render();
+  },{passive:true});
+
   var sw=null;
   document.addEventListener("touchstart",function(e){
     var b=e.target.closest(".swipe-body");
@@ -1182,6 +1219,10 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   function tick(){el("clock").textContent=new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});}
   tick();setInterval(tick,30000);
   load();render();
+  setTimeout(function(){
+    var sp=el("splash");
+    if(sp){sp.classList.add("gone");setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},700);}
+  },1500);
   if(CODE){pull().catch(function(){openGate(true);});}else{openGate(false);}
   window.addEventListener("focus",function(){if(CODE)pull().catch(function(){});});
 })();

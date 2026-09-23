@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#000000">
 <style>html{background:#000}body{background:#000;margin:0}
 #splash{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center}
-html.warm{background:#0E332C}html.warm #splash{display:none}</style>
+html.warm{background:#0E332C}html.warm #splash{opacity:0;animation:spFade .35s ease forwards}html.warm #splash.gone{animation:none;opacity:0}@keyframes spFade{to{opacity:1}}</style>
 <script>(function(){try{var h=+localStorage.getItem("rc.hide")||0;if(h&&Date.now()-h<600000){document.documentElement.className+=" warm";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content","#0E332C");}}catch(e){}
 function mark(){try{localStorage.setItem("rc.hide",String(Date.now()));}catch(e){}}
 document.addEventListener("visibilitychange",function(){if(document.hidden)mark();});window.addEventListener("pagehide",mark);})();</script>
@@ -134,6 +134,10 @@ input{width:100%;font-family:var(--text);font-size:15px;color:var(--porcelain);
   background:rgba(241,238,230,.07);border:1px solid var(--faint);border-radius:14px;padding:13px 14px;outline:none;}
 input:focus{border-color:var(--brass)}
 input::placeholder{color:rgba(241,238,230,.35)}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;height:50px;line-height:22px;text-align:left;color-scheme:dark}
+input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left;margin:0;min-height:22px}
+input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-calendar-picker-indicator{opacity:.6;filter:invert(1)}
+.field{min-width:0}
 textarea{width:100%;min-height:110px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--porcelain);
   background:rgba(241,238,230,.07);border:1px solid var(--faint);border-radius:14px;padding:12px;outline:none;resize:vertical}
 textarea:focus{border-color:var(--brass)}
@@ -314,7 +318,7 @@ var sh=Math.max(screen.height,screen.width);var w=window.innerWidth<window.inner
 w=(w>0&&w<130?w:0);r.style.setProperty("--shim",w+"px");
 var pr=document.createElement("div");pr.style.cssText="position:absolute;visibility:hidden;padding-bottom:env(safe-area-inset-bottom)";(document.body||r).appendChild(pr);var eb=parseFloat(getComputedStyle(pr).paddingBottom)||0;pr.parentNode.removeChild(pr);
 var st=navigator.standalone||(window.matchMedia&&matchMedia("(display-mode: standalone)").matches);
-if(st&&w>0&&eb===0)r.style.setProperty("--hib","20px");else r.style.removeProperty("--hib");}
+if(st&&w>0&&eb===0)r.style.setProperty("--hib","28px");else r.style.removeProperty("--hib");}
 fit();window.addEventListener("resize",fit);window.addEventListener("orientationchange",function(){setTimeout(fit,300);});window.addEventListener("pageshow",fit);document.addEventListener("DOMContentLoaded",fit);})();</script>
 <div class="phone">
   <div class="notch"></div>

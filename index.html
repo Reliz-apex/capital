@@ -24,7 +24,7 @@
 <link rel="apple-touch-startup-image" media="(device-width:375px) and (device-height:667px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)" href="startup/s750x1334.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all';window.__gf=1">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
@@ -247,7 +247,8 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 #splash{position:fixed;inset:0;z-index:200;background:#08211D;
   display:flex;align-items:center;justify-content:center;transition:opacity .5s ease}
 #splash.gone{opacity:0;pointer-events:none}
-.sp-in{text-align:center;padding:0 32px;animation:spIn .7s cubic-bezier(.2,.8,.3,1)}
+.sp-in{text-align:center;padding:0 32px;opacity:0}
+#splash.ready .sp-in{opacity:1;animation:spIn .6s cubic-bezier(.2,.8,.3,1)}
 .sp-title{font-family:var(--display),system-ui,-apple-system,sans-serif;font-weight:500;font-size:30px;letter-spacing:-.03em;color:var(--porcelain);margin-bottom:12px}
 .sp-sub{font-size:14px;color:var(--brass-soft);line-height:1.5}
 @keyframes spIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -266,11 +267,13 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 @media (max-width:540px){
   body{padding:0;gap:0;background:#08211D;position:fixed;inset:0;overflow:hidden;overscroll-behavior:none}
   .intro{display:none}
-  .phone{width:100%;height:100%;max-height:none;border-radius:0;border:none;box-shadow:none}
+  .phone{width:100%;height:var(--appH,100%);max-height:none;border-radius:0;border:none;box-shadow:none}
   .notch{display:none}
   .statusbar{display:none}
-  .views{padding:calc(env(safe-area-inset-top) + 26px) 20px calc(112px + env(safe-area-inset-bottom))}
-  .tabbar{height:auto;min-height:0;padding:9px 4px calc(10px + env(safe-area-inset-bottom));background:#061713;align-items:flex-start}
+  .views{padding:calc(env(safe-area-inset-top) + 26px) 20px calc(96px + max(0px, env(safe-area-inset-bottom) - var(--shim,0px)))}
+  .tabbar{height:auto;min-height:0;padding:8px 4px max(8px, calc(8px + env(safe-area-inset-bottom) - var(--shim,0px)));background:#08211D;backdrop-filter:none;-webkit-backdrop-filter:none;border-top:1px solid rgba(241,238,230,.1);align-items:flex-start}
+  .tab{font-size:10.5px}
+  .sheet{padding-bottom:max(28px, calc(16px + env(safe-area-inset-bottom) - var(--shim,0px)))}
   h2.title{margin-top:4px}
 }
 .party{text-align:center;padding:6px 0 4px}
@@ -291,7 +294,14 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     <div class="sp-sub">Добро пожаловать, Александр Валерьевич</div>
   </div>
 </div>
-<script>setTimeout(function(){var s=document.getElementById("splash");if(s&&s.parentNode)s.parentNode.removeChild(s);},3500);</script>
+<script>setTimeout(function(){var s=document.getElementById("splash");if(s&&s.parentNode)s.parentNode.removeChild(s);},4000);
+(function(){var r=document.documentElement;
+function fit(){var a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;
+var h=window.innerHeight;if(window.visualViewport&&visualViewport.height&&visualViewport.height<h)h=visualViewport.height;
+if(!h||h<300)return;r.style.setProperty("--appH",h+"px");
+var sh=Math.max(screen.height,screen.width);var w=window.innerWidth<window.innerHeight?Math.round(sh-h):0;
+r.style.setProperty("--shim",(w>0&&w<130?w:0)+"px");}
+fit();window.addEventListener("resize",fit);window.addEventListener("orientationchange",function(){setTimeout(fit,300);});window.addEventListener("pageshow",fit);document.addEventListener("DOMContentLoaded",fit);})();</script>
 <div class="phone">
   <div class="notch"></div>
   <div class="statusbar"><span id="clock">9:41</span><span>●●● ⌁ ▮</span></div>
@@ -1254,10 +1264,24 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   function tick(){el("clock").textContent=new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});}
   tick();setInterval(tick,30000);
   load();render();
-  setTimeout(function(){
-    var sp=el("splash");
-    if(sp){sp.classList.add("gone");setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},700);}
-  },900);
+  (function(){
+    var shown=false,t0=Date.now();
+    function spShow(){
+      if(shown)return;shown=true;
+      var sp=el("splash");if(!sp)return;
+      sp.classList.add("ready");
+      setTimeout(function(){sp.classList.add("gone");setTimeout(function(){if(sp.parentNode)sp.parentNode.removeChild(sp);},600);},1000);
+    }
+    function waitFonts(){
+      if(shown)return;
+      if(!window.__gf){if(Date.now()-t0<1200)return setTimeout(waitFonts,40);return spShow();}
+      if(document.fonts&&document.fonts.load){
+        Promise.all([document.fonts.load("500 30px Unbounded"),document.fonts.load("500 14px Manrope")]).then(spShow,spShow);
+      }else spShow();
+    }
+    setTimeout(spShow,1400);
+    waitFonts();
+  })();
   if(CODE){pull().catch(function(){openGate(true);});}else{openGate(false);}
   window.addEventListener("focus",function(){if(CODE)pull().catch(function(){});});
 })();

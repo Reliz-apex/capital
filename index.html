@@ -8,9 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="Reliz Capital">
 <meta name="theme-color" content="#000000">
 <style>html{background:#000}body{background:#000;margin:0}
-#splash{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center}
-html.warm{background:#0E332C}html.warm #splash{opacity:0;animation:spFade .35s ease forwards}html.warm #splash.gone{animation:none;opacity:0}@keyframes spFade{to{opacity:1}}</style>
-<script>(function(){try{var h=+localStorage.getItem("rc.hide")||0;if(h&&Date.now()-h<600000){document.documentElement.className+=" warm";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content","#0E332C");}}catch(e){}
+#splash{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center}</style>
+<script>(function(){try{var h=+localStorage.getItem("rc.hide")||0;}catch(e){}
 function mark(){try{localStorage.setItem("rc.hide",String(Date.now()));}catch(e){}}
 document.addEventListener("visibilitychange",function(){if(document.hidden)mark();});window.addEventListener("pagehide",mark);})();</script>
 <title>Reliz Capital</title>
@@ -1343,12 +1342,12 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
     }
     function waitFonts(){
       if(shown)return;
-      if(!window.__gf){if(Date.now()-t0<1200)return setTimeout(waitFonts,40);return spShow();}
+      if(!window.__gf){if(Date.now()-t0<500)return setTimeout(waitFonts,40);return spShow();}
       if(document.fonts&&document.fonts.load){
         Promise.all([document.fonts.load("500 30px Unbounded"),document.fonts.load("500 14px Manrope")]).then(spShow,spShow);
       }else spShow();
     }
-    setTimeout(spShow,1400);
+    setTimeout(spShow,700);
     waitFonts();
   })();
   if(CODE){pull().catch(function(){openGate(true);});}else{openGate(false);}

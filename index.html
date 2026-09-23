@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+undefined<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="Reliz Capital">
 <meta name="theme-color" content="#08211D">
 <style>html{background:#08211D}body{background:#08211D;margin:0}
-#splash{position:fixed;inset:0;z-index:200;background:linear-gradient(180deg,#12463C 0%,#08211D 100%);display:flex;align-items:center;justify-content:center}</style>
+#splash{position:fixed;inset:0;z-index:200;background:#08211D;display:flex;align-items:center;justify-content:center}</style>
 <title>Reliz Capital</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="appicon180.png">
@@ -228,12 +228,12 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 .x{background:none;border:none;color:var(--muted);font-size:12px;padding:0;cursor:pointer;text-decoration:underline;font-weight:500}
 .back{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;padding:8px 0;display:flex;align-items:center;gap:6px;cursor:pointer}
 
-.tabbar{position:absolute;left:0;right:0;bottom:0;height:88px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:88px;
   background:linear-gradient(180deg, rgba(6,23,19,.72), rgba(6,23,19,.97));
   backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border-top:1px solid var(--faint);display:flex;padding:12px 8px 26px;z-index:30;}
 .tabbar::-webkit-scrollbar{display:none}
-.tab{flex:1 0 auto;min-width:19%;background:none;border:none;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--muted);font-size:10.5px;font-weight:600;cursor:pointer}
+.tab{flex:1 1 0;min-width:0;background:none;border:none;padding:4px 1px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap}
 .tab svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .tab.on{color:var(--brass)}
 
@@ -244,8 +244,8 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 .sheet h3{font-family:var(--display);font-weight:400;font-size:18px;margin:2px 0 16px;letter-spacing:-.02em}
 .grab{width:38px;height:4px;border-radius:3px;background:var(--faint);margin:0 auto 14px}
 #fw{position:absolute;inset:0;z-index:70;pointer-events:none;display:none}
-#splash{position:fixed;inset:0;z-index:200;background:linear-gradient(180deg,#12463C 0%,#08211D 100%);
-  display:flex;align-items:center;justify-content:center;transition:opacity .55s ease}
+#splash{position:fixed;inset:0;z-index:200;background:#08211D;
+  display:flex;align-items:center;justify-content:center;transition:opacity .5s ease}
 #splash.gone{opacity:0;pointer-events:none}
 .sp-in{text-align:center;padding:0 32px;animation:spIn .7s cubic-bezier(.2,.8,.3,1)}
 .sp-title{font-family:var(--display),system-ui,-apple-system,sans-serif;font-weight:500;font-size:30px;letter-spacing:-.03em;color:var(--porcelain);margin-bottom:12px}
@@ -269,8 +269,8 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
   .phone{width:100%;height:100%;max-height:none;border-radius:0;border:none;box-shadow:none}
   .notch{display:none}
   .statusbar{display:none}
-  .views{padding:calc(env(safe-area-inset-top) + 26px) 20px calc(120px + env(safe-area-inset-bottom))}
-  .tabbar{height:auto;padding:10px 8px calc(8px + env(safe-area-inset-bottom));background:#061713}
+  .views{padding:calc(env(safe-area-inset-top) + 26px) 20px calc(112px + env(safe-area-inset-bottom))}
+  .tabbar{height:auto;min-height:0;padding:9px 4px calc(10px + env(safe-area-inset-bottom));background:#061713;align-items:flex-start}
   h2.title{margin-top:4px}
 }
 .party{text-align:center;padding:6px 0 4px}

@@ -1,0 +1,12 @@
+{
+  "name": "Reliz Capital",
+  "short_name": "Capital",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08211D",
+  "theme_color": "#08211D",
+  "lang": "ru",
+  "icons": [{ "src": "appicon180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }]
+}

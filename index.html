@@ -2,12 +2,13 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="dark">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Reliz Capital">
 <meta name="theme-color" content="#000000">
-<style>html{background:#000}body{background:#000;margin:0}
+<style>html{background:#000;color-scheme:dark}body{background:#000;margin:0}
 #splash{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center}</style>
 <script>(function(){try{var h=+localStorage.getItem("rc.hide")||0;}catch(e){}
 function mark(){try{localStorage.setItem("rc.hide",String(Date.now()));}catch(e){}}
@@ -1354,5 +1355,6 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
   window.addEventListener("focus",function(){if(CODE)pull().catch(function(){});});
 })();
 </script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){});}</script>
 </body>
 </html>

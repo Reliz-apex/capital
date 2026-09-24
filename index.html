@@ -240,6 +240,42 @@ label.fl{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
 .b-danger{background:rgba(232,131,107,.14);color:var(--danger);border:1px solid rgba(232,131,107,.35);flex:1}
 .htoast{position:absolute;left:50%;bottom:110px;transform:translate(-50%,20px);background:var(--porcelain);color:#08211D;font-size:13px;font-weight:700;padding:10px 16px;border-radius:14px;opacity:0;transition:.25s;z-index:90;white-space:nowrap;pointer-events:none}
 .htoast.on{opacity:1;transform:translate(-50%,0)}
+.wnav{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px}
+.wnav b{font-family:var(--display);font-weight:400;font-size:17px;letter-spacing:-.02em;text-align:center;flex:1}
+.wnav b small{display:block;font-family:var(--text);font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:0;margin-top:3px}
+.wnav button{background:none;border:none;color:var(--muted);font-size:24px;padding:4px 12px;line-height:1}
+.wnav button:disabled{opacity:.25}
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wcard{background:rgba(241,238,230,.05);border:1px solid var(--faint);border-radius:18px;padding:13px 14px;min-width:0}
+.wcard .k{font-size:11.5px;color:var(--muted);font-weight:600}
+.wcard .v{font-family:var(--display);font-weight:400;font-size:19px;letter-spacing:-.02em;margin:5px 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wcard .d{font-size:11.5px;color:var(--muted);line-height:1.4}
+.wcard .d.up{color:var(--danger)}.wcard .d.down{color:var(--mint)}.wcard .d.good{color:var(--mint)}
+.wcats{margin-top:8px;display:grid;gap:9px}
+.wcat{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px}
+.wcat span{font-weight:600}
+.wcat em{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums}
+.wcat .bar{grid-column:1/-1;margin-top:0;height:6px}
+.wcat .bar i{background:var(--danger)}
+.wline{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--faint);font-size:13.5px}
+.wline:last-child{border-bottom:none}
+.wline span{color:var(--muted)}
+.wline b{font-weight:700;text-align:right}
+.wq label{display:block;font-size:12px;color:var(--muted);margin:14px 0 6px}
+.wq textarea{width:100%;min-height:74px;font-family:var(--text);font-size:16px;line-height:1.45;color:var(--porcelain);background:rgba(241,238,230,.07);border:1px solid var(--faint);border-radius:14px;padding:12px 14px;outline:none;resize:none}
+.wq textarea:focus{border-color:var(--brass)}
+.wq .fi{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.wq .fi input{flex:1;min-width:0}
+.wq .fi i{font-style:normal;width:24px;height:24px;border-radius:8px;background:rgba(217,164,65,.18);color:var(--brass-soft);display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0}
+.wdone{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--mint);background:rgba(127,209,185,.12);border:1px solid rgba(127,209,185,.35);border-radius:10px;padding:5px 10px}
+.wtick{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--porcelain);background:none;border:none;padding:0;text-align:left}
+.wtick s{width:22px;height:22px;border-radius:7px;border:1.7px solid var(--muted);display:grid;place-items:center;text-decoration:none;font-size:12px;color:transparent;flex-shrink:0}
+.wtick.on s{background:var(--mint);border-color:var(--mint);color:#08211D}
+.wban{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;margin-bottom:14px;background:linear-gradient(135deg,rgba(217,164,65,.18),rgba(217,164,65,.06));border:1px solid rgba(217,164,65,.4)}
+.wban div{flex:1;min-width:0}
+.wban b{display:block;font-size:14px}
+.wban small{font-size:12px;color:var(--muted)}
+
 
 .hday .fl2{width:8px;height:8px;border-radius:3px;background:var(--danger);flex-shrink:0}
 .hday .fl2.t{background:var(--mint)}
@@ -486,8 +522,9 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
     <!-- ЗАДАЧИ -->
     <section class="view on" id="v-tasks">
       <h2 class="title" id="tTitle">Задачи</h2>
-      <div class="tseg" id="tSeg"><button data-tmode="tasks" class="on">Задачи</button><button data-tmode="habits">Привычки</button></div>
+      <div class="tseg" id="tSeg"><button data-tmode="tasks" class="on">Задачи</button><button data-tmode="habits">Привычки</button><button data-tmode="week">Неделя</button></div>
       <div id="tasksPane">
+      <div id="wBan"></div>
       <div class="calhead">
         <button class="mnav" data-tmon="-1" aria-label="Предыдущий месяц">‹</button>
         <b id="calTitle">—</b>
@@ -498,6 +535,7 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
       <div class="row" style="margin-top:0"><button class="b-brass" data-sheet="task">Добавить задачу</button></div>
       <div id="dayList" style="margin-top:14px"></div>
       </div>
+      <div id="weekPane" hidden><div id="wBody"></div></div>
       <div id="habPane" hidden>
         <div class="hsum">
           <div class="hring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(241,238,230,.1)" stroke-width="8"/><circle id="hArc" cx="40" cy="40" r="34" fill="none" stroke="#7FD1B9" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset .5s"/></svg><div class="v" id="hRingV">0/0</div></div>
@@ -696,6 +734,7 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
     if(!Array.isArray(S.habits))S.habits=[];
     if(!S.hlog||typeof S.hlog!=="object"||Array.isArray(S.hlog))S.hlog={};
     if(!S.hmoved||typeof S.hmoved!=="object")S.hmoved={};
+    if(!S.reviews||typeof S.reviews!=="object"||Array.isArray(S.reviews))S.reviews={};
     if(!S.pig)S.pig={target:0,month:"",start:"",steps:[],celebrated:false,doneDate:""};
     if(!S.pig.steps)S.pig.steps=[];
     if(!S.pig.month)S.pig.month=monthKey(today());
@@ -1247,6 +1286,8 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
       }).join(""):(selHol?"":'<div class="empty">На этот день ничего не запланировано.</div>')));
 
     renderHabits();
+    renderWeekBanner();
+    if(tMode==="week"&&!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#weekPane")))renderWeek();
     // цели
     var used=S.dreams.reduce(function(a,d){return a+d.share;},0);
     var reached=null;
@@ -1280,7 +1321,7 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
   /* ---- привычки ---- */
   var DN=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
   var hSel=null, tMode="tasks";
-  try{if(localStorage.getItem("rc.tmode")==="habits")tMode="habits";}catch(e){}
+  try{var _tm=localStorage.getItem("rc.tmode");if(_tm==="habits"||_tm==="week")tMode=_tm;}catch(e){}
   function addD(s,n){var d=parseDay(s);d.setDate(d.getDate()+n);return iso(d);}
   function dow(s){return (parseDay(s).getDay()+6)%7;}
   function hById(id){return S.habits.filter(function(x){return x.id===id;})[0];}
@@ -1311,9 +1352,10 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
   function setMode(md){
     tMode=md;try{localStorage.setItem("rc.tmode",md);}catch(e){}
     el("tSeg").querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.tmode===md);});
-    el("tasksPane").hidden=md!=="tasks";el("habPane").hidden=md!=="habits";
-    el("tTitle").textContent=md==="tasks"?"Задачи":"Привычки";
+    el("tasksPane").hidden=md!=="tasks";el("habPane").hidden=md!=="habits";el("weekPane").hidden=md!=="week";
+    el("tTitle").textContent=md==="tasks"?"Задачи":md==="habits"?"Привычки":"Итоги недели";
     if(md==="habits")renderHabits();
+    if(md==="week")renderWeek();
   }
   function renderHabits(){
     if(tMode!=="habits")return;
@@ -1418,6 +1460,104 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
       else{h.title=t;h.days=f.days;h.target=f.target;h.value=v;h.time=tm2;hToast("Сохранено");}
       save();closeSheet();renderHabits();};
   }
+
+  /* ---- итоги недели ---- */
+  var wSel=null, wAddTasks=true;
+  function wStart(ds){return addD(ds,-dow(ds));}
+  function wDue(){var td=today(),d=dow(td);if(d===6)return wStart(td);if(d===0)return addD(wStart(td),-7);return null;}
+  function wLabel(ws){var a=parseDay(ws),b=parseDay(addD(ws,6));
+    var f=function(d,mo){return d.getDate()+(mo?" "+d.toLocaleDateString("ru-RU",{month:"long"}).replace(/^(\S+).*/,"$1"):"");};
+    var sameM=a.getMonth()===b.getMonth();
+    var mn=function(d){return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"});};
+    return sameM?a.getDate()+"–"+mn(b):mn(a)+" – "+mn(b);}
+  function wIn(ds,ws){return ds>=ws&&ds<=addD(ws,6);}
+  function wStats(ws){
+    var we=addD(ws,6),r={};
+    var tk=S.tasks.filter(function(t){return wIn(t.date,ws);});
+    r.tTotal=tk.length;r.tDone=tk.filter(function(t){return t.done;}).length;
+    r.tOpen=tk.filter(function(t){return !t.done;});
+    var ex=S.expenses.filter(function(e){return wIn(e.date,ws);});
+    r.exp=ex.reduce(function(a,e){return a+e.amount;},0);
+    var pws=addD(ws,-7);r.expPrev=S.expenses.filter(function(e){return wIn(e.date,pws);}).reduce(function(a,e){return a+e.amount;},0);
+    var cats={};ex.forEach(function(e){cats[e.cat]=(cats[e.cat]||0)+e.amount;});
+    r.cats=Object.keys(cats).map(function(k){return {c:k,v:cats[k]};}).sort(function(a,b){return b.v-a.v;}).slice(0,3);
+    var ops=S.ops.filter(function(o){return wIn(o.date,ws);});
+    r.inn=ops.filter(function(o){return o.type==="in";}).reduce(function(a,o){return a+o.amount;},0);
+    r.out=ops.filter(function(o){return o.type==="out";}).reduce(function(a,o){return a+o.amount;},0);
+    var due=0,dn=0,per={};
+    for(var i=0;i<7;i++){var ds=addD(ws,i);if(ds>today())break;
+      S.habits.forEach(function(h){if(!hDue(ds,h))return;due++;per[h.id]=per[h.id]||{h:h,d:0,n:0};per[h.id].n++;if(hDone(ds,h)){dn++;per[h.id].d++;}});}
+    r.hDue=due;r.hDone=dn;
+    var pl=Object.keys(per).map(function(k){var p=per[k];p.r=p.d/p.n;return p;}).sort(function(a,b){return b.r-a.r||b.n-a.n;});
+    r.hBest=pl[0]||null;r.hWorst=pl.length>1&&pl[pl.length-1].r<1?pl[pl.length-1]:null;
+    return r;
+  }
+  function wReviewStreak(){var s=0,ws=wDue()||addD(wStart(today()),-7);
+    if(!(S.reviews[ws]&&S.reviews[ws].done))ws=addD(ws,-7);
+    while(S.reviews[ws]&&S.reviews[ws].done){s++;ws=addD(ws,-7);}return s;}
+  function renderWeekBanner(){
+    var wd=wDue(),box=el("wBan");if(!box)return;
+    if(!wd||(S.reviews[wd]&&S.reviews[wd].done)){box.innerHTML="";return;}
+    box.innerHTML='<div class="wban"><div><b>Итоги недели готовы</b><small>'+wLabel(wd)+' · займёт 10 минут</small></div><button class="b-brass b-small" data-wopen="'+wd+'">Открыть</button></div>';
+  }
+  function renderWeek(){
+    var cur=wStart(today());
+    if(!wSel)wSel=wDue()||cur;
+    if(wSel>cur)wSel=cur;
+    var ws=wSel,st=wStats(ws),rv=S.reviews[ws]||{},isCur=ws===cur,td=today();
+    var dExp=st.expPrev?Math.round((st.exp-st.expPrev)/st.expPrev*100):null;
+    var hp=st.hDue?Math.round(st.hDone/st.hDue*100):null;
+    var got=collected(),pt=S.pig.target||0,pp=pt?Math.min(100,Math.round(got/pt*100)):0;
+    var capT=S.balance+assetsTotal(),li=levelOf(capT);
+    var h='<div class="wnav"><button data-wnav="-1" aria-label="Предыдущая неделя">‹</button><b>'+wLabel(ws)+'<small>'+(isCur?"текущая неделя":ws===addD(cur,-7)?"прошлая неделя":"")+(rv.done?' · обзор завершён':'')+'</small></b><button data-wnav="1" aria-label="Следующая неделя"'+(isCur?" disabled":"")+'>›</button></div>';
+    h+='<div class="wgrid">'+
+      '<div class="wcard"><div class="k">Задачи</div><div class="v">'+st.tDone+' из '+st.tTotal+'</div><div class="d'+(st.tTotal&&st.tDone===st.tTotal?" good":"")+'">'+(st.tTotal?(st.tOpen.length?"не закрыто "+st.tOpen.length:"всё закрыто"):"задач не было")+'</div></div>'+
+      '<div class="wcard"><div class="k">Привычки</div><div class="v">'+(hp===null?"—":hp+"%")+'</div><div class="d'+(hp!==null&&hp>=80?" good":"")+'">'+(hp===null?"привычек нет":st.hDone+" из "+st.hDue+" отметок")+'</div></div>'+
+      '<div class="wcard"><div class="k">Расходы</div><div class="v">'+m(st.exp)+'</div><div class="d'+(dExp===null?"":dExp>0?" up":" down")+'">'+(dExp===null?"нет данных за прошлую":(dExp>0?"+":"")+dExp+"% к прошлой")+'</div></div>'+
+      '<div class="wcard"><div class="k">Пополнения</div><div class="v">'+m(st.inn)+'</div><div class="d">'+(st.out?"снято "+m(st.out):"снятий не было")+'</div></div>'+
+    '</div>';
+    if(st.cats.length){var mx=st.cats[0].v;h+='<div class="section-h"><span>Куда ушли деньги</span></div><div class="wcats">'+st.cats.map(function(c){return '<div class="wcat"><span>'+esc(c.c)+'</span><em>'+m(c.v)+'</em><div class="bar"><i style="width:'+Math.round(c.v/mx*100)+'%"></i></div></div>';}).join("")+'</div>';}
+    h+='<div class="section-h"><span>Картина</span></div><div>'+
+      (st.hBest?'<div class="wline"><span>Лучшая привычка</span><b>'+esc(st.hBest.h.title)+' · '+Math.round(st.hBest.r*100)+'%</b></div>':'')+
+      (st.hWorst?'<div class="wline"><span>Проседает</span><b>'+esc(st.hWorst.h.title)+' · '+Math.round(st.hWorst.r*100)+'%</b></div>':'')+
+      '<div class="wline"><span>Копилка за месяц</span><b>'+(pt?m(got)+" из "+m(pt)+" · "+pp+"%":"цель не задана")+'</b></div>'+
+      '<div class="wline"><span>Капитал</span><b>'+m(capT)+' · '+LEVELS[li].name+'</b></div>'+
+      '<div class="wline"><span>Обзоров подряд</span><b>'+wReviewStreak()+'</b></div>'+
+    '</div>';
+    if(st.tOpen.length){h+='<div class="section-h"><span>Не закрыто</span><em>'+st.tOpen.length+'</em></div><div>'+st.tOpen.slice(0,6).map(function(t){return '<div class="wline"><span>'+esc(t.title)+'</span><b style="font-weight:500;color:var(--muted)">'+parseDay(t.date).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})+'</b></div>';}).join("")+'</div>';}
+    var f=rv.focus||["","",""];
+    var nm=addD(ws,7);
+    h+='<div class="section-h"><span>Разбор</span>'+(rv.done?'<span class="wdone">✓ завершён</span>':'')+'</div><div class="wq">'+
+      '<label for="wWin">Что получилось на этой неделе</label><textarea id="wWin" data-wf="win" placeholder="Закрыл сделку, запустил рекламу…">'+esc(rv.win||"")+'</textarea>'+
+      '<label for="wBlock">Что мешало и что меняю</label><textarea id="wBlock" data-wf="block" placeholder="Много встреч без повестки → ставлю повестку заранее">'+esc(rv.block||"")+'</textarea>'+
+      '<label>Три главных дела на неделю '+wLabel(nm)+'</label>'+
+      [0,1,2].map(function(i){return '<div class="fi"><i>'+(i+1)+'</i><input id="wF'+i+'" data-wfi="'+i+'" placeholder="'+["Главное дело недели","Второе по важности","Третье"][i]+'" value="'+esc(f[i]||"").replace(/"/g,"&quot;")+'"></div>';}).join("")+
+      (rv.done?'':'<button class="wtick'+(wAddTasks?" on":"")+'" id="wTick"><s>✓</s>Добавить эти дела в задачи на '+parseDay(nm).toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"}).replace(/^[^,]+,\s*/,"понедельник, ")+'</button>')+
+      '<div class="row"><button class="b-brass" id="wFinish">'+(rv.done?"Сохранить изменения":"Завершить обзор")+'</button></div>'+
+    '</div>';
+    el("wBody").innerHTML=h;
+  }
+  function wGet(){if(!S.reviews[wSel])S.reviews[wSel]={win:"",block:"",focus:["","",""],done:false};return S.reviews[wSel];}
+  document.addEventListener("input",function(e){
+    var t=e.target;if(!t.closest||!t.closest("#weekPane"))return;
+    var r=wGet();
+    if(t.dataset.wf){r[t.dataset.wf]=t.value;save();}
+    if(t.dataset.wfi!==undefined){r.focus=r.focus||["","",""];r.focus[+t.dataset.wfi]=t.value;save();}
+  });
+  el("weekPane").addEventListener("click",function(e){
+    var n=e.target.closest("[data-wnav]");
+    if(n){var cur=wStart(today()),nx=addD(wSel,7*(+n.dataset.wnav));if(nx<=cur){wSel=nx;renderWeek();document.querySelector(".views").scrollTop=0;}return;}
+    if(e.target.closest("#wTick")){wAddTasks=!wAddTasks;e.target.closest("#wTick").classList.toggle("on",wAddTasks);return;}
+    if(e.target.closest("#wFinish")){
+      var r=wGet();r.win=el("wWin").value;r.block=el("wBlock").value;r.focus=[0,1,2].map(function(i){return el("wF"+i).value.trim();});
+      var first=!r.done,added=0;
+      if(first&&wAddTasks){var nm=addD(wSel,7);r.focus.forEach(function(x){if(x){S.tasks.push({id:uid(),title:x,date:nm,time:"",done:false});added++;}});}
+      r.done=true;r.doneAt=today();
+      save();render();renderWeek();document.querySelector(".views").scrollTop=0;
+      if(first)boom();
+      hToast(first?(added?"Обзор завершён · "+added+" "+plural(added,"дело","дела","дел")+" в задачах":"Обзор завершён"):"Сохранено");
+    }
+  });
   el("tSeg").addEventListener("click",function(e){var b=e.target.closest("[data-tmode]");if(b)setMode(b.dataset.tmode);});
   el("hAdd").addEventListener("click",function(){hEditor(null);});
   el("hMoneyBtn").addEventListener("click",function(){
@@ -1451,6 +1591,7 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
     if(ad){S.assets=S.assets.filter(function(x){return x.id!==ad.dataset.adel;});save();render();return;}
     var ed=e.target.closest("[data-edit]");
     if(ed){sheets.editDream(ed.dataset.edit);return;}
+    var wo=e.target.closest("[data-wopen]");if(wo){wSel=wo.dataset.wopen;setMode("week");document.querySelector(".views").scrollTop=0;return;}
     var ht=e.target.closest("[data-htog]");if(ht){hMark(ht.dataset.htog,false);return;}
     var hi=e.target.closest("[data-hinc]");if(hi){hMark(hi.dataset.hinc,true);return;}
     var hdl=e.target.closest("[data-hdel]");if(hdl){hDelete(hdl.dataset.hdel);return;}

@@ -1653,7 +1653,7 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
   var gate=el("gate");
   function openGate(err){
     gate.classList.add("on");
-    el("gerr").style.display=err?"block":"none";
+    el("gerr").textContent="Код не подошёл";el("gerr").style.display=err?"block":"none";
     setTimeout(function(){el("gcode").focus();},150);
   }
   function closeGate(){gate.classList.remove("on");}
@@ -1663,8 +1663,10 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
     pull().then(function(){
       try{localStorage.setItem("kopilka.code",CODE);}catch(e){}
       el("gok").textContent="Войти";el("gcode").value="";closeGate();
-    }).catch(function(){
-      CODE=null;el("gok").textContent="Войти";el("gerr").style.display="block";
+    }).catch(function(e){
+      CODE=null;el("gok").textContent="Войти";
+      el("gerr").textContent=(e&&e.message==="code")?"Код не подошёл":"Сервер сейчас недоступен. Попробуй позже или работай без синхронизации";
+      el("gerr").style.display="block";
     });
   });
   el("gcode").addEventListener("keydown",function(e){if(e.key==="Enter")el("gok").click();});
@@ -1742,8 +1744,16 @@ fit();window.addEventListener("resize",fit);window.addEventListener("orientation
     setTimeout(spShow,700);
     waitFonts();
   })();
-  if(CODE){pull().catch(function(){openGate(true);});}else{openGate(false);}
-  window.addEventListener("focus",function(){if(CODE)pull().catch(function(){});});
+  var offT=null,wasOff=false;
+  function onPullOk(){clearTimeout(offT);if(wasOff){wasOff=false;hToast("Синхронизация восстановлена");}}
+  function onPullFail(e){
+    if(e&&e.message==="code"){openGate(true);return;}
+    setSync("err");
+    if(!wasOff){wasOff=true;hToast("Сервер недоступен — работаю офлайн");}
+    clearTimeout(offT);offT=setTimeout(function(){if(CODE)pull().then(onPullOk).catch(onPullFail);},60000);
+  }
+  if(CODE){pull().then(onPullOk).catch(onPullFail);}else{openGate(false);}
+  window.addEventListener("focus",function(){if(CODE)pull().then(onPullOk).catch(onPullFail);});
 })();
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){});}</script>
